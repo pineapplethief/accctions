@@ -3,4 +3,6 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   # root "articles#index"
+
+  resource :healthcheck, controller: :health_check, only: %i[show]
 end
