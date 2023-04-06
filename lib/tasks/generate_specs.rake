@@ -37,8 +37,8 @@ namespace :github do
   end
 
   task :split do
-    ci_total = ENV['CI_TOTAL'] || 2
-    ci_index = (ENV['CI_INDEX'] || 1) + 1
+    ci_total = ENV['CI_TOTAL']
+    ci_index = ENV['CI_INDEX'].to_i + 1
 
     model_file_names = Dir[File.join(Rails.root, 'spec', 'models', '**', '*.rb')].map.with_index do |file_path, index|
       (index + 1) % ci_index == 0 ? file_path : nil

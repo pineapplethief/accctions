@@ -23,6 +23,8 @@ jobs:
       matrix:
         ci_index: [1, 2, 3, 4]
         ci_total: [4]
+    env:
+      ACTIONS_STEP_DEBUG: true
 
     steps:
       - uses: actions/checkout@v3
@@ -32,11 +34,20 @@ jobs:
           ruby-version: '3.1'
       - name: Install dependencies
         run: bundle install
-      # - name: Debug test splitting
-      #   run: echo "$(bundle exec rake github:split)" >> "$GITHUB_OUTPUT"
+      - name: Debug test splitting
+        id: splitter
+        run:
+          |
+            delimiter="$(openssl rand -hex 8)"
+            echo "output-name<<${delimiter}" >> "${GITHUB_OUTPUT}"
+            echo "testfiles=$(bundle exec rake github:split)" >> $GITHUB_OUTPUT
+            echo "${delimiter}" >> "${GITHUB_OUTPUT}"
       - name: Run tests
         run: bundle exec rake github:split | xargs bundle exec rspec
         env:
           CI_TOTAL: ${{ matrix.ci_total }}
           CI_INDEX: ${{ matrix.ci_index }}
+      - run:
+         |
+            echo "files tested: ${{ steps.splitter.outputs.testfiles }}"
       - run: echo "🍏 This job's status is ${{ job.status }}."
